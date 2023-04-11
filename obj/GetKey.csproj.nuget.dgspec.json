@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Donald\\source\\repos\\copads-project3\\project3.csproj": {}
+    "C:\\Users\\Donald\\source\\repos\\copads-project3\\GetKey.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Donald\\source\\repos\\copads-project3\\project3.csproj": {
+    "C:\\Users\\Donald\\source\\repos\\copads-project3\\GetKey.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Donald\\source\\repos\\copads-project3\\project3.csproj",
-        "projectName": "project3",
-        "projectPath": "C:\\Users\\Donald\\source\\repos\\copads-project3\\project3.csproj",
+        "projectUniqueName": "C:\\Users\\Donald\\source\\repos\\copads-project3\\GetKey.csproj",
+        "projectName": "GetKey",
+        "projectPath": "C:\\Users\\Donald\\source\\repos\\copads-project3\\GetKey.csproj",
         "packagesPath": "C:\\Users\\Donald\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\Donald\\source\\repos\\copads-project3\\obj\\",
         "projectStyle": "PackageReference",
