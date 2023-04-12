@@ -1,5 +1,0 @@
-C:\Users\Donald\source\repos\copads-project3\obj\Debug\net6.0\GetKey.csproj.AssemblyReference.cache
-C:\Users\Donald\source\repos\copads-project3\obj\Debug\net6.0\GetKey.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Donald\source\repos\copads-project3\obj\Debug\net6.0\GetKey.AssemblyInfoInputs.cache
-C:\Users\Donald\source\repos\copads-project3\obj\Debug\net6.0\GetKey.AssemblyInfo.cs
-C:\Users\Donald\source\repos\copads-project3\obj\Debug\net6.0\GetKey.csproj.CoreCompileInputs.cache
