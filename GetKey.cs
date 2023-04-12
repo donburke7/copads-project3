@@ -1,30 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace GetKeyApplication 
-{
 
-    public class GetKey {
-        public static readonly HttpClient client;
+namespace Messenger {
+    public class GetKeyClient {
+        public async void getKey(string email) {
 
-        public static void Main(String[] args) {
-            string testEmail = "toivcs@rit.edu";
+            using (var client = new HttpClient()) {
+                try {
+                    client.BaseAddress = new Uri("http://kayrun.cs.rit.edu:5000/Key/");
+                    var response = client.GetAsync(email).Result;
+                    if (response.IsSuccessStatusCode) {
+                        var responseBody = await response.Content.ReadAsStringAsync();
+                        JObject parsedJson = JObject.Parse(responseBody);
+                        JToken? key = parsedJson["key"];
+                        try {
+                            using (StreamWriter outputFile = 
+                                new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), email + ".key"))) {
+                                    outputFile.Write(key);
+                                }
+                        } catch (Exception e) { Console.WriteLine("Message :{0} ", e.Message); }
 
-            var KeyGet = new GetKey();
-            KeyGet.getKeyClient(testEmail);
-        }
+                    } else { Console.WriteLine("Status Code: " + response.StatusCode); }
 
-        public async void getKeyClient(string email) {
-            string responseBody = await client.GetStringAsync("http://kayrun.cs.rit.edu:5000/Message/" + email);
-
-            Console.WriteLine(responseBody);
+                } catch (HttpRequestException e) {
+                    Console.WriteLine("\nException Caught!");
+                    Console.WriteLine("Message :{0} ", e.Message);
+                }
+            }
         }
     }
 }
