@@ -11,12 +11,12 @@ namespace Messenger {
                     var response = client.GetAsync(email).Result;
                     if (response.IsSuccessStatusCode) {
                         var responseBody = await response.Content.ReadAsStringAsync();
-                        JObject parsedJson = JObject.Parse(responseBody);
-                        JToken? key = parsedJson["key"];
+                        // JObject parsedJson = JObject.Parse(responseBody);
+                        // JToken? key = parsedJson["key"];
                         try {
                             using (StreamWriter outputFile = 
                                 new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), email + ".key"))) {
-                                    outputFile.Write(key);
+                                    outputFile.Write(responseBody);
                                 }
                         } catch (Exception e) { Console.WriteLine("Message :{0} ", e.Message); }
 
