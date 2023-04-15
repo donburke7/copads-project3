@@ -1,5 +1,6 @@
-using Newtonsoft.Json.Linq;
 
+
+using Newtonsoft.Json;
 
 namespace Messenger {
     public class GetKeyClient {
@@ -28,5 +29,14 @@ namespace Messenger {
                 }
             }
         }
+    }
+
+    public class PublicKey {
+
+        [JsonProperty("email")]
+        public string Email { get; set; }
+
+        [JsonProperty("key")]
+        public string Key { get; set; }
     }
 }
