@@ -13,10 +13,10 @@ namespace Messenger {
 
             // Gets an person's public key and gathers E and N values for message encryption
             var jsonKey = File.ReadAllText($"{testEmail}.key");
-            PublicKey? keyObject = JsonConvert.DeserializeObject<PublicKey>(jsonKey);
-            if (keyObject is not null) {
+            KeyObject? keyObj = JsonConvert.DeserializeObject<KeyObject>(jsonKey);
+            if (keyObj is not null) {
                 // Create byte array from keyObject key   
-                byte[] byteArr = Convert.FromBase64String(keyObject.Key);
+                byte[] byteArr = Convert.FromBase64String(keyObj.Key);
                 
                 // Create int e
                 byte[] eArr = new byte[4];
@@ -41,8 +41,8 @@ namespace Messenger {
                 // Create BigInt N
                 byte[] NArr = new byte[e];
                 Array.Copy(byteArr, 8 + e, NArr, 0, n);
-                Array.Reverse(EArr);
-                BigInteger N = new BigInteger(EArr);
+                Array.Reverse(NArr);
+                BigInteger N = new BigInteger(NArr);
 
 
             }

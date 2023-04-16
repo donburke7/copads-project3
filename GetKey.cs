@@ -31,7 +31,7 @@ namespace Messenger {
         }
     }
 
-    public class PublicKey {
+    public class KeyObject {
 
         [JsonProperty("email")]
         public string Email { get; set; }

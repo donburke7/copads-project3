@@ -16,14 +16,57 @@ namespace Messenger {
             int pBitSize = this.keySize / 2 + variance;
             int qBitSize = keySize - pBitSize;
             // generate a p and q of bit size pBitSize and qBitSize
+            BigInteger p = PrimeGen.PrimeNumberGenerator(pBitSize);
+            BigInteger q = PrimeGen.PrimeNumberGenerator(qBitSize);
+            BigInteger r = (p - 1) * (q - 1);
 
-
-            //BigInteger r = (p - 1) * (q - 1);
+            BigInteger N = p * q;
             BigInteger E = PrimeGen.PrimeNumberGenerator(16);
-            //BigInteger D = modInverse(E, r);
+            BigInteger D = modInverse(E, r);
+            
+            byte[] EByteArr = E.ToByteArray();
+            byte[] DByteArr = D.ToByteArray();
+            byte[] NByteArr = N.ToByteArray();
+            
+            
+            byte[] privKeyByteArr = new byte[keySize];
 
+            int e = EByteArr.Length;
+            int d = DByteArr.Length;
+            int n = NByteArr.Length;
+            
             
 
+            //string pubKey = Convert.ToBase64String(pubKeyByteArr);
+            //string privKey = Convert.ToBase64String(privKeyByteArr);
+
+
+
+        }
+
+        public static void createPubKey(int keySize, byte[] EByteArr, int e, byte[] NByteArr, int n) {
+            byte[] pubKeyByteArr = new byte[keySize];
+
+            Array.Reverse(NByteArr);
+            Array.Copy(NByteArr, 0, pubKeyByteArr, 8 + e, n);
+
+            byte[] nByteArr = BitConverter.GetBytes(n);
+            if (BitConverter.IsLittleEndian) {
+                    Array.Reverse(nByteArr);
+                }
+            Array.Copy(nByteArr, 0, pubKeyByteArr, 4 + e, 4);
+
+            Array.Reverse(EByteArr);
+            Array.Copy(EByteArr, 0, pubKeyByteArr, 4, e);
+
+            byte[] eByteArr = BitConverter.GetBytes(e);
+            Array.Reverse(eByteArr);
+            Array.Copy(eByteArr, 0, pubKeyByteArr, 0, 4);
+
+            KeyObject publicKey = new KeyObject();
+            publicKey.Key = Convert.ToBase64String(pubKeyByteArr);
+            // upload this to local file
+            // copy all this for a private key
         }
 
         static BigInteger modInverse(BigInteger a, BigInteger n) {
