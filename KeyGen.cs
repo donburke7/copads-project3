@@ -1,19 +1,20 @@
 using System.Numerics;
 using System.Security.Cryptography;
+using Newtonsoft.Json;
 
 namespace Messenger {
 
-    public class KeyGen {
+    public class KeyGenerator {
 
-        public int keySize;
+        private int keySize;
 
-        public KeyGen(int keySize) {
+        public KeyGenerator(int keySize) {
             this.keySize = keySize;
         }
         
-        public void genKeys(int keySize) {
+        public void genKeys() {
             int variance = keySize / 4;
-            int pBitSize = this.keySize / 2 + variance;
+            int pBitSize = this.keySize / 2 - variance;
             int qBitSize = keySize - pBitSize;
             // generate a p and q of bit size pBitSize and qBitSize
             BigInteger p = PrimeGen.PrimeNumberGenerator(pBitSize);
@@ -27,25 +28,18 @@ namespace Messenger {
             byte[] EByteArr = E.ToByteArray();
             byte[] DByteArr = D.ToByteArray();
             byte[] NByteArr = N.ToByteArray();
-            
-            
-            byte[] privKeyByteArr = new byte[keySize];
+        
 
             int e = EByteArr.Length;
             int d = DByteArr.Length;
             int n = NByteArr.Length;
             
-            
-
-            //string pubKey = Convert.ToBase64String(pubKeyByteArr);
-            //string privKey = Convert.ToBase64String(privKeyByteArr);
-
-
-
+            createPubKey(keySize, EByteArr, e, NByteArr, n);
+            createPrivKey(keySize, DByteArr, d, NByteArr, n);
         }
 
         public static void createPubKey(int keySize, byte[] EByteArr, int e, byte[] NByteArr, int n) {
-            byte[] pubKeyByteArr = new byte[keySize];
+            byte[] pubKeyByteArr = new byte[8 + e + n];
 
             Array.Reverse(NByteArr);
             Array.Copy(NByteArr, 0, pubKeyByteArr, 8 + e, n);
@@ -65,8 +59,45 @@ namespace Messenger {
 
             KeyObject publicKey = new KeyObject();
             publicKey.Key = Convert.ToBase64String(pubKeyByteArr);
-            // upload this to local file
-            // copy all this for a private key
+
+            try {
+                using (StreamWriter outputFile = 
+                    new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), "public.key"))) {
+                        outputFile.Write(JsonConvert.SerializeObject(publicKey));
+                    }
+            } catch (Exception ex) { Console.WriteLine("Message :{0} ", ex.Message); }
+
+        }
+
+        public static void createPrivKey(int keySize, byte[] DByteArr, int d, byte[] NByteArr, int n) {
+            byte[] privKeyByteArr = new byte[8 + d + n];
+
+            Array.Reverse(NByteArr);
+            Array.Copy(NByteArr, 0, privKeyByteArr, 8 + d, n);
+
+            byte[] nByteArr = BitConverter.GetBytes(n);
+            if (BitConverter.IsLittleEndian) {
+                    Array.Reverse(nByteArr);
+                }
+            Array.Copy(nByteArr, 0, privKeyByteArr, 4 + d, 4);
+
+            Array.Reverse(DByteArr);
+            Array.Copy(DByteArr, 0, privKeyByteArr, 4, d);
+
+            byte[] dByteArr = BitConverter.GetBytes(d);
+            Array.Reverse(dByteArr);
+            Array.Copy(dByteArr, 0, privKeyByteArr, 0, 4);
+
+            KeyObject privateKey = new KeyObject();
+            privateKey.Key = Convert.ToBase64String(privKeyByteArr);
+
+            try {
+                using (StreamWriter outputFile = 
+                    new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), "private.key"))) {
+                        outputFile.Write(JsonConvert.SerializeObject(privateKey));
+                    }
+            } catch (Exception ex) { Console.WriteLine("Message :{0} ", ex.Message); }
+
         }
 
         static BigInteger modInverse(BigInteger a, BigInteger n) {
