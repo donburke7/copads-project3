@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 namespace Messenger {
 
     public class KeyGenerator {
-
+        
         private int keySize;
 
         public KeyGenerator(int keySize) {
@@ -41,23 +41,23 @@ namespace Messenger {
         public static void createPubKey(int keySize, byte[] EByteArr, int e, byte[] NByteArr, int n) {
             byte[] pubKeyByteArr = new byte[8 + e + n];
 
-            Array.Reverse(NByteArr);
             Array.Copy(NByteArr, 0, pubKeyByteArr, 8 + e, n);
 
             byte[] nByteArr = BitConverter.GetBytes(n);
             if (BitConverter.IsLittleEndian) {
                     Array.Reverse(nByteArr);
-                }
+            }
             Array.Copy(nByteArr, 0, pubKeyByteArr, 4 + e, 4);
 
-            Array.Reverse(EByteArr);
             Array.Copy(EByteArr, 0, pubKeyByteArr, 4, e);
 
             byte[] eByteArr = BitConverter.GetBytes(e);
-            Array.Reverse(eByteArr);
+            if (BitConverter.IsLittleEndian) {
+                    Array.Reverse(eByteArr);
+            }
             Array.Copy(eByteArr, 0, pubKeyByteArr, 0, 4);
 
-            KeyObject publicKey = new KeyObject();
+            PubKeyObject publicKey = new PubKeyObject();
             publicKey.Key = Convert.ToBase64String(pubKeyByteArr);
 
             try {
@@ -72,23 +72,23 @@ namespace Messenger {
         public static void createPrivKey(int keySize, byte[] DByteArr, int d, byte[] NByteArr, int n) {
             byte[] privKeyByteArr = new byte[8 + d + n];
 
-            Array.Reverse(NByteArr);
             Array.Copy(NByteArr, 0, privKeyByteArr, 8 + d, n);
 
             byte[] nByteArr = BitConverter.GetBytes(n);
             if (BitConverter.IsLittleEndian) {
-                    Array.Reverse(nByteArr);
-                }
+                Array.Reverse(nByteArr);
+            }
             Array.Copy(nByteArr, 0, privKeyByteArr, 4 + d, 4);
 
-            Array.Reverse(DByteArr);
             Array.Copy(DByteArr, 0, privKeyByteArr, 4, d);
 
             byte[] dByteArr = BitConverter.GetBytes(d);
-            Array.Reverse(dByteArr);
+            if (BitConverter.IsLittleEndian) {
+                Array.Reverse(dByteArr);
+            }
             Array.Copy(dByteArr, 0, privKeyByteArr, 0, 4);
 
-            KeyObject privateKey = new KeyObject();
+            PrivKeyObject privateKey = new PrivKeyObject();
             privateKey.Key = Convert.ToBase64String(privKeyByteArr);
 
             try {
