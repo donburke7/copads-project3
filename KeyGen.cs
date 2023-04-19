@@ -2,64 +2,90 @@ using System.Numerics;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
 
+/// <summary>
+/// Donald Burke
+/// CSCI 251
+/// </summary>
 namespace Messenger {
 
+    /// <summary>
+    /// Responsible for generating both public and private RSA keys
+    /// </summary>
     public class KeyGenerator {
         
+        /// <summary>
+        /// Represents size of the keys in bits
+        /// </summary>
         private int keySize;
 
+        /// <summary>
+        /// KeyGenerator constructor
+        /// </summary>
+        /// <param name="keySize">Key size in bits taken from user input</param>
         public KeyGenerator(int keySize) {
             this.keySize = keySize;
         }
         
+        /// <summary>
+        /// Driver method that calls createPubKey and createPrivKey and
+        /// uses the PrimeGen class to generate prime numbers for values needed
+        /// to generate the public and private keys
+        /// </summary>
         public void genKeys() {
             int variance = keySize / 4;
             int pBitSize = this.keySize / 2 - variance;
             int qBitSize = keySize - pBitSize;
-            // generate a p and q of bit size pBitSize and qBitSize
+            // Generate a p and q of bit size pBitSize and qBitSize
             BigInteger p = PrimeGen.PrimeNumberGenerator(pBitSize);
             BigInteger q = PrimeGen.PrimeNumberGenerator(qBitSize);
             BigInteger r = (p - 1) * (q - 1);
-
+            // Generate N, E and D values
             BigInteger N = p * q;
             BigInteger E = PrimeGen.PrimeNumberGenerator(16);
             BigInteger D = modInverse(E, r);
-            
+            // Convert them into byte arrays
             byte[] EByteArr = E.ToByteArray();
             byte[] DByteArr = D.ToByteArray();
             byte[] NByteArr = N.ToByteArray();
-        
-
+            // Gather the size of their byte arrays and assign them to
+            // e, d and n respectively
             int e = EByteArr.Length;
             int d = DByteArr.Length;
             int n = NByteArr.Length;
-            
+            // Call key generation methods
             createPubKey(keySize, EByteArr, e, NByteArr, n);
             createPrivKey(keySize, DByteArr, d, NByteArr, n);
         }
 
+        /// <summary>
+        /// Creates a public key and stores it into a file called public.key
+        /// </summary>
+        /// <param name="keySize">Size of the key in bits</param>
+        /// <param name="EByteArr">E value as a byte array</param>
+        /// <param name="e">The size of EByteArr</param>
+        /// <param name="NByteArr">N value as a byte array</param>
+        /// <param name="n">The size of NByteArr</param>
         public static void createPubKey(int keySize, byte[] EByteArr, int e, byte[] NByteArr, int n) {
+            // Use parameter values to create a public key represented as a byte array
             byte[] pubKeyByteArr = new byte[8 + e + n];
-
             Array.Copy(NByteArr, 0, pubKeyByteArr, 8 + e, n);
-
             byte[] nByteArr = BitConverter.GetBytes(n);
             if (BitConverter.IsLittleEndian) {
                     Array.Reverse(nByteArr);
             }
             Array.Copy(nByteArr, 0, pubKeyByteArr, 4 + e, 4);
-
             Array.Copy(EByteArr, 0, pubKeyByteArr, 4, e);
-
             byte[] eByteArr = BitConverter.GetBytes(e);
             if (BitConverter.IsLittleEndian) {
                     Array.Reverse(eByteArr);
             }
             Array.Copy(eByteArr, 0, pubKeyByteArr, 0, 4);
 
+            // Create the public key object and store the string form of 
+            // pubKeyByteArr as the key
             PubKeyObject publicKey = new PubKeyObject();
             publicKey.Key = Convert.ToBase64String(pubKeyByteArr);
-
+            // Store the key in the public.key file
             try {
                 using (StreamWriter outputFile = 
                     new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), "public.key"))) {
@@ -69,28 +95,34 @@ namespace Messenger {
 
         }
 
+        /// <summary>
+        /// Creates a private key and stores it into a file called private.key
+        /// </summary>
+        /// <param name="keySize">Size of the key in bits</param>
+        /// <param name="DByteArr">D value as a byte array</param>
+        /// <param name="d">Size of DByteArr</param>
+        /// <param name="NByteArr">N value as a byte array</param>
+        /// <param name="n">Size of NByteArr</param>
         public static void createPrivKey(int keySize, byte[] DByteArr, int d, byte[] NByteArr, int n) {
+            // Use parameter values to create a private key represented as a byte array
             byte[] privKeyByteArr = new byte[8 + d + n];
-
             Array.Copy(NByteArr, 0, privKeyByteArr, 8 + d, n);
-
             byte[] nByteArr = BitConverter.GetBytes(n);
             if (BitConverter.IsLittleEndian) {
                 Array.Reverse(nByteArr);
             }
             Array.Copy(nByteArr, 0, privKeyByteArr, 4 + d, 4);
-
             Array.Copy(DByteArr, 0, privKeyByteArr, 4, d);
-
             byte[] dByteArr = BitConverter.GetBytes(d);
             if (BitConverter.IsLittleEndian) {
                 Array.Reverse(dByteArr);
             }
             Array.Copy(dByteArr, 0, privKeyByteArr, 0, 4);
-
+            // Creates a private key object and store the string form of 
+            // privKeyByteArr as the key
             PrivKeyObject privateKey = new PrivKeyObject();
             privateKey.Key = Convert.ToBase64String(privKeyByteArr);
-
+            // Store the key in the private.key file
             try {
                 using (StreamWriter outputFile = 
                     new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), "private.key"))) {
@@ -100,6 +132,12 @@ namespace Messenger {
 
         }
 
+        /// <summary>
+        /// ModInverse function provided in writeup
+        /// </summary>
+        /// <param name="a">a value provided in writeup</param>
+        /// <param name="n">n value provided in writeup</param>
+        /// <returns>BigInteger to be used as D value</returns>
         static BigInteger modInverse(BigInteger a, BigInteger n) {
             BigInteger i = n, v = 0, d = 1;
             while (a > 0) {
@@ -116,6 +154,9 @@ namespace Messenger {
         }
     }
 
+    /// <summary>
+    /// Prime generator copied over from my Project 2 work
+    /// </summary>
     public static class PrimeGen {
 
         /// <summary>
